@@ -1,14 +1,7 @@
 import json
-from http.server import BaseHTTPRequestHandler
+
 
 from flask import Flask,request
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type','application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps({"message": "Hello!"}).encode('utf-8'))
-        return
 
 app = Flask(__name__)
 
@@ -16,9 +9,9 @@ with open('data.json', 'r') as file:
     data = json.load(file)
 @app.route('/')
 def home():
-    return ('Hello welcome home')
+    return 'Hello welcome home,enter your name get you marks'
 
-@app.route('/api<name>', methods=['GET'])
+@app.route('/<name>', methods=['GET'])
 def get_marks():
     # Get the student's name from the query parameter
     student_name = request.args.get('name')

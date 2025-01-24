@@ -18,7 +18,7 @@ with open('data.json', 'r') as file:
 def home():
     return ('Hello welcome home')
 
-@app.route('/get-marks', methods=['GET'])
+@app.route('/api<name>', methods=['GET'])
 def get_marks():
     # Get the student's name from the query parameter
     student_name = request.args.get('name')

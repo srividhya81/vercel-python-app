@@ -1,6 +1,6 @@
 # api.py
 import json
-from flask import Flask, request
+from flask import Flask, request,jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -25,22 +25,26 @@ def get_marks():
     student_data = load_student_data()
 
 
-    # Get list of 'name' parameters from the query
-    names = request.args.getlist('names')
-     # Split the comma-separated names in the path (e.g., 'X,Y' -> ['X', 'Y'])
-    names_list = names.split(',')
+  
+ # Get the 'name' parameter from the query string (case-insensitive)
+    name = request.args.get('name', '').strip()
 
-        # Prepare the response dictionary
-    result = {}
+    # Normalize the input name to lowercase to handle case insensitivity
+    name_lower = name.lower()
 
-    # For each name, check if it exists in the database (case-insensitive)
-    for name in names_list:
-        name_lower = name.lower()  # Convert the input name to lowercase
-        mark = student_data.get(name_lower, "Not found")  # Get the mark or 'Not found'
-        result[name] = mark  # Return name as it was entered with the corresponding mark
+    # Search for the name case-insensitively, but retain the original case from the JSON data
+    found_name = None
+    for key in student_data.keys():
+        if key.lower() == name_lower:  # Case-insensitive comparison
+            found_name = key  # Store the name in the original case
+            break
 
-    # Return the result as a JSON object
-    return json.dumps(result)
+    # If a match is found, return the mark, otherwise, return a "Not found" message
+    if found_name:
+        mark = student_data[found_name]  # Get the mark for the found name
+        return jsonify({found_name: mark})
+    else:
+        return jsonify({"error": f"Student '{name}' not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0")

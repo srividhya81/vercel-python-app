@@ -1,32 +1,40 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
+from http.server import BaseHTTPRequestHandler
 
-
-from flask import Flask,request
-
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type','application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({"message": "Hello!"}).encode('utf-8'))
+        return
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
-with open('data.json', 'r') as file:
-    data = json.load(file)
-@app.route('/')
-def home():
-    return 'Hello welcome home,enter your name get you marks'
+def load_data():
+    with open('data.json', 'r') as file:  # Replace 'data.json' with your JSON file path
+        return json.load(file)
 
-@app.route('/<name>', methods=['GET'])
+@app.route('/api', methods=['GET'])
 def get_marks():
-    # Get the student's name from the query parameter
-    student_name = request.args.get('name')
-    
-    if not student_name:
-        return ({"error": "Please provide a student name."}), 400
+    # Retrieve 'name' query parameters from the request
+    names = request.args.getlist('name')
 
-    # Look up the student's marks
-    marks = data.get(student_name)
+    if not names:
+        return jsonify({"error": "At least one 'name' parameter is required."}), 400
 
-    if marks is None:
-        return ({"error": f"Student '{student_name}' not found."}), 404
+    try:
+        # Load data from JSON file
+        data = load_data()
 
-    return ({"name": student_name, "marks": marks})
+        # Fetch marks for the given names
+        marks = [item['marks'] for item in data if item['name'] in names]
 
+        return jsonify({"marks": marks})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

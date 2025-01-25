@@ -26,20 +26,18 @@ def find_student_mark(name, student_data):
 def welcome():
     return "Welcome All!"
 
-# Single route to handle both the query parameter and the URL parameter for retrieving marks
-
-@app.route('/api/<name>', methods=['GET'])
-def get_marks(name=None):
+# Single route that handles only query parameters to retrieve marks
+@app.route('/api', methods=['GET'])
+def get_marks():
     student_data = load_student_data()
 
-    # If 'name' is passed as a URL parameter (e.g., /api/John), use it
-    if not name:
-        # Otherwise, fetch the 'name' parameter from the query string
-        name = request.args.get('name', '').strip()
+    # Get the 'name' parameter from the query string
+    name = request.args.get('name', '').strip()
 
     if not name:
         return jsonify({"error": "No student name provided"}), 400
 
+    # Use the helper function to search for the student mark
     found_name, mark = find_student_mark(name, student_data)
 
     if found_name:

@@ -30,12 +30,17 @@ def get_marks():
      # Split the comma-separated names in the path (e.g., 'X,Y' -> ['X', 'Y'])
     names_list = names.split(',')
 
-    # Fetch the marks for each name, return 'Not found' if not in the database
-    marks = [student_data.get(name, "Not found") for name in names_list]
+        # Prepare the response dictionary
+    result = {}
 
-    # Return the marks in JSON format
-    return json.dumps({"marks": marks})
+    # For each name, check if it exists in the database (case-insensitive)
+    for name in names_list:
+        name_lower = name.lower()  # Convert the input name to lowercase
+        mark = student_data.get(name_lower, "Not found")  # Get the mark or 'Not found'
+        result[name] = mark  # Return name as it was entered with the corresponding mark
 
+    # Return the result as a JSON object
+    return json.dumps(result)
 
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0")

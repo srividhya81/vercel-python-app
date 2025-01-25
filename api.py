@@ -411,8 +411,8 @@ marks_db = [{
 @app.route('/api<name>', methods=['GET'])
 def get_marks():
     names = request.args.getlist('name')
-    marks = [marks_db.get(name, "Not found") for name in names]
-    return json.dumps({"marks": marks})
+    marks = [marks_db.get(marks) for name in names]
+    return json.dumps({"name": 'name'},{"marks": marks})
 
 if __name__ == '__main__':
     app.run(debug=True)

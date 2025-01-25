@@ -408,7 +408,7 @@ marks_db = [{
     "marks": 41
   }]
 
-@app.route('/api', methods=['GET'])
+@app.route('/api<name>', methods=['GET'])
 def get_marks():
     names = request.args.getlist('name')
     marks = [marks_db.get(name, "Not found") for name in names]

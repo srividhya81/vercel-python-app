@@ -19,16 +19,19 @@ def load_student_data():
     with open('data.json') as f:
         return json.load(f)
 
-@app.route('/api', methods=['GET'])
+@app.route('/api/<names>', methods=['GET'])
 def get_marks():
     # Load student data
     student_data = load_student_data()
 
+
     # Get list of 'name' parameters from the query
-    names = request.args.getlist('name')
+    names = request.args.getlist('names')
+     # Split the comma-separated names in the path (e.g., 'X,Y' -> ['X', 'Y'])
+    names_list = names.split(',')
 
     # Fetch the marks for each name, return 'Not found' if not in the database
-    marks = [student_data.get(name, "Not found") for name in names]
+    marks = [student_data.get(name, "Not found") for name in names_list]
 
     # Return the marks in JSON format
     return json.dumps({"marks": marks})

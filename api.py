@@ -18,7 +18,25 @@ def hello():
 def load_student_data():
     with open('data.json') as f:
         return json.load(f)
+@app.route('/api',methods = ['GET'])
+def get_queries():
+       # Load student data from JSON database
+    student_data = load_student_data()
 
+    # Get the 'name' parameter from the query string (case-insensitive)
+    name = request.args.get('name', '').strip()
+
+    # Normalize the name to lowercase to handle case insensitivity
+    name_lower = name.lower()
+
+    # Check if the name exists in the database (case-insensitive)
+    mark = student_data.get(name_lower, "Not found")
+
+    # Return the result as a JSON response
+    if mark == "Not found":
+        return jsonify({"error": f"Student '{name}' not found"}), 404
+    else:
+        return jsonify({name: mark})
 @app.route('/api/<names>', methods=['GET'])
 def get_marks():
     # Load student data

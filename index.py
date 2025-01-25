@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 from http.server import BaseHTTPRequestHandler
-
+from asgiref.wsgi import WsgiToAsgi  # ASGI wrapper for Flask
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -32,9 +32,10 @@ def get_marks():
         # Fetch marks for the given names
         marks = [item['marks'] for item in data if item['name'] in names]
 
-        return jsonify({"marks": marks})
+        return jsonify({"name": names},{"marks": marks})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+asgi_app = WsgiToAsgi(app)
+#if __name__ == '__main__':
+ #   app.run(debug=True,port=8000)
